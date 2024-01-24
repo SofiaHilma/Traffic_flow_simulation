@@ -30,11 +30,12 @@ def plot_simulation(simulation):
         for j in range(timesteps):
             a[j, i] = str(int(simulation[j][i])) if simulation[j][i] > -1 else ''
 
-    fig, ax = plt.subplots(dpi=150)
+    fig, ax = plt.subplots(figsize = (L/7.5, timesteps/7.5))
     ax.set_xticks(np.arange(L))
     ax.set_yticks(np.arange(timesteps))
     ax.set_xticklabels([])
     ax.set_yticklabels([])
+    ax.invert_yaxis()
 
     for i in range(timesteps):
         for j in range(L):
