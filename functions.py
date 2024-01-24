@@ -29,7 +29,7 @@ def Nagel_Schreckenberg(L, N, v_max, p, t_max):
                 current[(pos+v)%L] = v # Moving
 
                 # Update flow count between neighboring cells
-                if vtemp > 0:
+                if v > 0:
                     flow_counts[t] += 1
 
         positions.append(current)
