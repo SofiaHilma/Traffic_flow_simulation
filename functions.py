@@ -35,7 +35,7 @@ def Nagel_Schreckenberg(L, N, v_max, p, t_max):
                     flow_counts[t] += 1
 
                 # Update the cluster count
-                if (pos > 0 and previous[pos-1] > -1) or (pos < len(previous)-1 and previous[pos+1] > -1):
+                if (current[(pos-1)%L] > -1) or (current[(pos+1)%L] > -1):
                     cluster_count[t] += 1
 
         positions.append(current)
