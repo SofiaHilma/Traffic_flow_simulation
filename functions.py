@@ -69,7 +69,5 @@ def plot_simulation(simulation):
 # Calculate the average flow over the whole timespan for a specific density
 def calculate_time_averaged_flow(flow_counts, t_max):
     total_flow = sum(flow_counts)  # Sum the entire array
-
     time_averaged_flow = total_flow / t_max  # Calculate the average
-
     return time_averaged_flow
