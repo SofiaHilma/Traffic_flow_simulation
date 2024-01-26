@@ -1,4 +1,4 @@
-def Nagel_Schreckenberg(L, N, v_max, p, t_max):
+def Nagel_Schreckenberg(L, N, v_max, p, t_max, max_brake=1):
     import random
     import numpy as np
 
@@ -38,7 +38,7 @@ def Nagel_Schreckenberg(L, N, v_max, p, t_max):
                     d += 1 
                 vtemp = min(vi + 1, d - 1, v_max) # Accelerating
                 if random.uniform(0,1) < p: # Random braking
-                    v = max(vtemp-1, 0)
+                    v = max(vtemp-random.randint(1, max_brake), 0)
                 else:
                     v = vtemp
                 current[(pos+v)%L] = v # Updates the cars position
@@ -101,8 +101,6 @@ def plot_simulation(simulation):
     plt.title('Traffic Simulation')
     plt.grid(color='black', linestyle='-', linewidth=0.5, alpha=0.5)
     plt.show()
-
-
 
     
 # Calculate the average flow over the whole timespan for a specific density
