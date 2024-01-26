@@ -7,14 +7,19 @@ def Nagel_Schreckenberg(L, N, v_max, p, t_max):
     random.shuffle(positions)
     positions = [positions]
 
-    # To store the flow counts for each timestep
-    flow_counts = np.zeros(t_max)  
     # To store the cluster count for each timestep
     cluster_count = np.zeros(t_max)
+    # To store the flow count for a fixed cell (4) over all time t_max
+    flow_single_cell = 0
+    density = 0
 
     # For each timestep we update the car positions and values
     for t in range(t_max):
         previous, current = positions[-1], L * [-1]
+        
+        # Determine if there is a car in this cell
+        if previous[4] > -1:
+            density += 1
 
         # Go through all the cells in the row
         for pos in range(L):
@@ -30,16 +35,29 @@ def Nagel_Schreckenberg(L, N, v_max, p, t_max):
                     v = vtemp
                 current[(pos+v)%L] = v # Updates the cars position
 
-                # Update flow count between neighboring cells
-                if v > 0:
-                    flow_counts[t] += 1
+                # Update flow count between neighboring cells (only cells 4 and 5)
+                if pos == 4:
+                    if v > 0: 
+                        flow_single_cell += 1 
+                if pos == 3: 
+                    if v > 1: 
+                        flow_single_cell += 1 
+                if pos == 2: 
+                    if v > 2: 
+                        flow_single_cell += 1 
+                if pos == 1:
+                    if v > 3: 
+                        flow_single_cell += 1 
+                if pos == 0: 
+                    if v > 4: 
+                        flow_single_cell += 1 
 
                 # Update the cluster count
                 if (current[(pos-1)%L] > -1) or (current[(pos+1)%L] > -1):
                     cluster_count[t] += 1
 
         positions.append(current)
-    return positions, flow_counts, cluster_count
+    return positions, flow_counts, cluster_count, density, flow_single_cell
 
 
 
