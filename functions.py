@@ -60,7 +60,6 @@ def Nagel_Schreckenberg(L, N, v_max, p, t_max, max_brake=1):
     return positions, cluster_count, density, flow_single_cell
 
 
-
 def plot_simulation(simulation):
     import numpy as np
     import matplotlib.pyplot as plt
@@ -87,8 +86,6 @@ def plot_simulation(simulation):
     plt.title('Traffic Simulation')
     plt.grid(color='black', linestyle='-', linewidth=0.5, alpha=0.5)
     plt.show()
-
-
 
     
 # Calculate the average flow over the whole timespan for a specific density
