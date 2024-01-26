@@ -9,6 +9,17 @@ def Nagel_Schreckenberg(L, N, v_max, p, t_max):
 
     # To store the cluster count for each timestep
     cluster_count = np.zeros(t_max)
+
+    # Store the average velocity of one car over all time = [car1_time1, ..., car1_timeEnd
+    #                                                                   ...
+    #                                                  carEnd_time1, ..., carEnd_timeEnd]
+    # average velocity of all cars per time step
+    average_velocity = 0
+    total_velocity = 0
+    
+    '''s = (2,2)
+    np.zeros(s)'''
+
     # To store the flow count for a fixed cell (4) over all time t_max
     flow_single_cell = 0
     density = 0
@@ -20,6 +31,8 @@ def Nagel_Schreckenberg(L, N, v_max, p, t_max):
         # Determine if there is a car in this cell
         if previous[4] > -1:
             density += 1
+
+        one_time_total_velocity = 0
 
         # Go through all the cells in the row
         for pos in range(L):
@@ -56,8 +69,14 @@ def Nagel_Schreckenberg(L, N, v_max, p, t_max):
                 if (current[(pos-1)%L] > -1) or (current[(pos+1)%L] > -1):
                     cluster_count[t] += 1
 
+                # Update the car velocity count
+                one_time_total_velocity += v
+
         positions.append(current)
-    return positions, flow_counts, cluster_count, density, flow_single_cell
+        one_time_total_velocity = one_time_total_velocity/N
+        total_velocity += one_time_total_velocity
+    average_velocity = total_velocity/t_max
+    return positions, cluster_count, density, flow_single_cell, average_velocity
 
 
 
