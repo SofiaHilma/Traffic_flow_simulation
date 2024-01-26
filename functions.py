@@ -1,4 +1,4 @@
-def Nagel_Schreckenberg(L, N, v_max, p, t_max, max_brake=1):
+def Nagel_Schreckenberg(L, N, v_max, p, t_max, max_brake=1, max_acceleration = 1):
     import random
     import numpy as np
 
@@ -36,7 +36,7 @@ def Nagel_Schreckenberg(L, N, v_max, p, t_max, max_brake=1):
                 vi = previous[pos] # Store the velocity of the car in the previous timestep 
                 while previous[(pos + d) % L] < 0: # Check how many spaces ahead are free
                     d += 1 
-                vtemp = min(vi + 1, d - 1, v_max) # Accelerating
+                vtemp = min(vi + random.uniform(1,max_acceleration), d - 1, v_max) # Accelerating
                 if random.uniform(0,1) < p: # Random braking
                     v = max(vtemp-random.randint(1, max_brake), 0)
                 else:
