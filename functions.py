@@ -1,4 +1,4 @@
-def Nagel_Schreckenberg(L, N, v_max, p, t_max):
+def Nagel_Schreckenberg(L, N, v_max, p, t_max, max_brake=1):
     import random
     import numpy as np
 
@@ -30,7 +30,7 @@ def Nagel_Schreckenberg(L, N, v_max, p, t_max):
                     d += 1 
                 vtemp = min(vi + 1, d - 1, v_max) # Accelerating
                 if random.uniform(0,1) < p: # Random braking
-                    v = max(vtemp-1, 0)
+                    v = max(vtemp-random.randint(1, max_brake), 0)
                 else:
                     v = vtemp
                 current[(pos+v)%L] = v # Updates the cars position
@@ -57,7 +57,7 @@ def Nagel_Schreckenberg(L, N, v_max, p, t_max):
                     cluster_count[t] += 1
 
         positions.append(current)
-    return positions, flow_counts, cluster_count, density, flow_single_cell
+    return positions, cluster_count, density, flow_single_cell
 
 
 
