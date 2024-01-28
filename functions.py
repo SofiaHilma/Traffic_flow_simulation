@@ -9,6 +9,11 @@ def Nagel_Schreckenberg(L, N, v_max, p, t_max, max_brake=1, max_acceleration = 1
 
     # To store the cluster count for each timestep
     cluster_count = np.zeros(t_max)
+    
+    # Store the number of cells in clusters for each timestep
+    cells_in_clusters = np.zeros(t_max)
+    # Store the number of clusters for each timestep
+    cluster_count = np.zeros(t_max)
 
     # average velocity of all cars per time step
     average_velocity = 0
@@ -27,7 +32,9 @@ def Nagel_Schreckenberg(L, N, v_max, p, t_max, max_brake=1, max_acceleration = 1
         if previous[4] > -1:
             density += 1
 
+        # For each timestep reset the velocity count to zero
         one_time_total_velocity = 0
+        cluster_state = False # Set this to false for counting cells in clusters later
 
         # Go through all the cells in the row
         for pos in range(L):
@@ -60,18 +67,31 @@ def Nagel_Schreckenberg(L, N, v_max, p, t_max, max_brake=1, max_acceleration = 1
                     if v > 4: 
                         flow_single_cell += 1 
 
-                # Update the cluster count
-                if (current[(pos-1)%L] > -1) or (current[(pos+1)%L] > -1):
-                    cluster_count[t] += 1
-
                 # Update the car velocity count
                 one_time_total_velocity += v
 
+            # Count the number of cells in a cluster
+            if (current[pos-1]>-1) and (current[pos-2]>-1): # if two cells to the left are cars
+                cells_in_clusters[t] += 1
+                cluster_state = True
+            if (current[pos-1] == -1) and (current[pos-2]>-1) and cluster_state:
+                cells_in_clusters[t] += 1 # there's a delayed aspect in this way of counting, so we add an extra count
+                cluster_state = False
+
+            # Update the number of clusters: if i'm not a car and i have 2 cars to my left: +1
+            if (current[pos] == -1) and (current[pos-1] > -1) and (current[pos-2] > -1):
+                cluster_count[t] += 1
+
         positions.append(current)
-        one_time_total_velocity = one_time_total_velocity/N
+
+        # Get the average velocity for this time step and add it to the total velocity
+        one_time_total_velocity = one_time_total_velocity/N 
         total_velocity += one_time_total_velocity
-    average_velocity = total_velocity/t_max
-    return positions, cluster_count, density, flow_single_cell, average_velocity
+
+    # Average the total velocity over the number of timesteps
+    average_velocity = total_velocity/t_max 
+
+    return positions, cells_in_clusters, density, flow_single_cell, average_velocity, cluster_count
 
 
 
