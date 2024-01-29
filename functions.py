@@ -120,3 +120,144 @@ def calculate_time_averaged_flow(flow_counts, t_max):
     time_averaged_flow = total_flow / t_max
     return time_averaged_flow
 
+
+
+
+# Two lanes function (only a start)
+
+def Two_Lane_CA(L, N, v_max, p, t_max, switch_trigger, min_front_gap, min_back_gap, max_brake=1, max_acceleration = 1):
+    import random
+    import numpy as np
+
+    # Initializing the first two rows (left and right lane). Cars are denoted with 0 and no car with -1.
+    left_lane = N*[0] + (L-N)*[-1]
+    random.shuffle(left_lane)
+    left_lane = [left_lane]
+
+    right_lane = N*[0] + (L-N)*[-1]
+    random.shuffle(right_lane)
+    right_lane = [right_lane]
+
+
+    # For each timestep we update the car positions and values
+    for t in range(t_max):
+        previous_left_road, current_left_road = left_lane[-1], L * [-1]
+        previous_right_road, current_right_road = right_lane[-1], L * [-1]
+    
+        # Go through all the cells in the two rows
+        for pos in range(L):
+
+            # Check the LEFT lane
+
+            if previous_left_road[pos] > -1: # Check if there is a car in this cell
+                d = 1              # Set the distance to the car ahead as 1 for now
+                other_lane_front_distance = 0
+
+                vi = previous_left_road[pos] # Store the velocity of the car in the previous timestep 
+                while previous_left_road[(pos + d) % L] < 0: # Check how many spaces ahead are free
+                    d += 1 
+                while previous_right_road[(pos + other_lane_front_distance)%L]<0:
+                    other_lane_front_distance += 1 # Count the distance to a car 'infront' on the other lane
+
+                # If the car is too close to a car ahead, and if there is enough space on the other lane, we switch
+                if switch_trigger > d and min_front_gap < other_lane_front_distance:
+                    # The car only changes lane and doesn't advance. It keeps its previous speed
+                    current_right_road[pos] = vi
+
+                else: # Otherwise we didn't switch, but can advance in our own lane
+                    vtemp = min(vi + random.randint(1,max_acceleration), d - 1, v_max) # Accelerating
+                    if random.uniform(0,1) < p: # Random braking
+                        v = max(vtemp-random.randint(1, max_brake), 0)
+                    else:
+                        v = vtemp
+                    current_left_road[(pos+v)%L] = v # Updates the cars position
+            
+            # Check the RIGHT lane
+
+            if previous_right_road[pos] > -1: # Check if there is a car in this cell
+                d = 1              # Set the distance to the car ahead as 1 for now
+                other_lane_front_distance = 0
+
+                vi = previous_right_road[pos] # Store the velocity of the car in the previous timestep 
+                while previous_right_road[(pos + d) % L] < 0: # Check how many spaces ahead are free
+                    d += 1 
+                while previous_left_road[(pos + other_lane_front_distance)%L]<0:
+                    other_lane_front_distance += 1 # Count the distance to a car 'infront' on the other lane
+
+                # If the car is too close to a car ahead, and if there is enough space on the other lane, we switch
+                if switch_trigger > d and min_front_gap < other_lane_front_distance:
+                    # The car only changes lane and doesn't advance. It keeps its previous speed
+                    current_left_road[pos] = vi
+
+                else: # Otherwise we didn't switch, but can advance in our own lane
+                    vtemp = min(vi + random.randint(1,max_acceleration), d - 1, v_max) # Accelerating
+                    if random.uniform(0,1) < p: # Random braking
+                        v = max(vtemp-random.randint(1, max_brake), 0)
+                    else:
+                        v = vtemp
+                    current_right_road[(pos+v)%L] = v # Updates the cars position
+
+        left_lane.append(current_left_road)
+        right_lane.append(current_right_road)
+
+    return left_lane, right_lane
+
+
+
+# Plotting the two lanes
+
+def plot_simulation(simulation_left, simulation_right):
+    import numpy as np
+    import matplotlib.pyplot as plt
+
+    # Set the timestep and the length of the road (although they should be the same!)
+    timesteps_left, L_left = len(simulation_left), len(simulation_left[0])
+    timesteps_right, L_right = len(simulation_right), len(simulation_right[0])
+    
+    fig, (ax_left, ax_right) = plt.subplots(1, 2, figsize=(12, 6))  # Create subplots for left and right lanes
+
+    # Plot the LEFT lane
+
+    # a_left holds the data for the left lane
+    a_left = np.empty(shape=(timesteps_left, L_left), dtype=object)
+    for i in range(L_left): # Go through the length of the road
+        for j in range(timesteps_left): # Go through the time steps
+            # Set the value of this cell of this cell if it has a car
+            a_left[j, i] = str(int(simulation_left[j][i])) if simulation_left[j][i] > -1 else ''
+    
+    ax_left.set_xticks(np.arange(L_left))
+    ax_left.set_yticks(np.arange(timesteps_left))
+    ax_left.invert_yaxis()
+    for i in range(timesteps_left):
+        for j in range(L_left):
+            text = ax_left.text(j, i, a_left[i, j], ha="center", va="center")
+
+    # Plot the RIGHT lane in the same way
+            
+    a_right = np.empty(shape=(timesteps_right, L_right), dtype=object)
+    for i in range(L_right):
+        for j in range(timesteps_right):
+            a_right[j, i] = str(int(simulation_right[j][i])) if simulation_right[j][i] > -1 else ''
+    
+    ax_right.set_xticks(np.arange(L_right))
+    ax_right.set_yticks(np.arange(timesteps_right))
+    ax_right.invert_yaxis()
+    for i in range(timesteps_right):
+        for j in range(L_right):
+            text = ax_right.text(j, i, a_right[i, j], ha="center", va="center")
+
+    # Apply grids and labels to both subplots
+    ax_left.grid(color='black', linestyle='-', linewidth=0.5, alpha=0.5)
+    ax_right.grid(color='black', linestyle='-', linewidth=0.5, alpha=0.5)
+
+    ax_left.set_xlabel('Left lane cells')
+    ax_left.set_ylabel('Time steps')
+
+    ax_right.set_xlabel('Right lane cells')
+    ax_right.set_ylabel('Time steps')
+    plt.suptitle('Two lanes simulation')
+    plt.show()
+
+
+    
+
