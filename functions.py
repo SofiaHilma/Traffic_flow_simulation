@@ -1,26 +1,26 @@
-def Nagel_Schreckenberg(L, N, v_max, p, t_max, max_brake=1, max_acceleration = 1):
+def Nagel_Schreckenberg(L, N, v_max, p, t_max, max_brake = 1, max_acceleration = 1, seed = 2024):
+    """
+    asdfhjdsf
+    """
     import random
     import numpy as np
 
-    # Initializing the first row. Cars are denoted with 0 and no car with -1.
-    positions = N*[0] + (L-N)*[-1]
-    random.shuffle(positions)
-    positions = [positions]
+    random.seed(seed)
 
-    # To store the cluster count for each timestep
-    cluster_count = np.zeros(t_max)
+    # Initialises the first row. Cars are denoted with 0 and empty spaces with -1.
+    initial = N*[0] + (L-N)*[-1]
+    random.shuffle(initial)
+    positions = [initial]
     
-    # Store the number of cells in clusters for each timestep
+    # Lists for cluster size and amount
     cells_in_clusters = np.zeros(t_max)
-    # Store the number of clusters for each timestep
     cluster_count = np.zeros(t_max)
 
-    # average velocity of all cars per time step
+    # Variables for velocity statistics
     average_velocity = 0
     total_velocity = 0
-    
 
-    # To store the flow count for a fixed cell (4) over all time t_max
+    # Variables for measuring flow through cell 4
     flow_single_cell = 0
     density = 0
 
@@ -36,51 +36,38 @@ def Nagel_Schreckenberg(L, N, v_max, p, t_max, max_brake=1, max_acceleration = 1
         one_time_total_velocity = 0
         cluster_state = False # Set this to false for counting cells in clusters later
 
-        # Go through all the cells in the row
         for pos in range(L):
             if previous[pos] > -1: # Check if there is a car in this cell
-                d = 1              # Set the distance to the car ahead as 1 for now
-                vi = previous[pos] # Store the velocity of the car in the previous timestep 
-                while previous[(pos + d) % L] < 0: # Check how many spaces ahead are free
-                    d += 1 
-                vtemp = min(vi + random.randint(1,max_acceleration), d - 1, v_max) # Accelerating
+                distance_ahead = 1
+                v_prev = previous[pos]
+                while previous[(pos + distance_ahead) % L] < 0: # Check how many spaces ahead are free
+                    distance_ahead += 1 
+                v_temp = min(v_prev + random.randint(1, max_acceleration), distance_ahead - 1, v_max) # Accelerating
                 if random.uniform(0,1) < p: # Random braking
-                    v = max(vtemp-random.randint(1, max_brake), 0)
+                    v = max(v_temp-random.randint(1, max_brake), 0)
                 else:
-                    v = vtemp
+                    v = v_temp
                 current[(pos+v)%L] = v # Updates the cars position
-
-                # Update flow count between neighboring cells (only cells 4 and 5)
-                if pos == 4:
-                    if v > 0: 
-                        flow_single_cell += 1 
-                if pos == 3: 
-                    if v > 1: 
-                        flow_single_cell += 1 
-                if pos == 2: 
-                    if v > 2: 
-                        flow_single_cell += 1 
-                if pos == 1:
-                    if v > 3: 
-                        flow_single_cell += 1 
-                if pos == 0: 
-                    if v > 4: 
-                        flow_single_cell += 1 
-
+                
                 # Update the car velocity count
                 one_time_total_velocity += v
 
             # Count the number of cells in a cluster
-            if (current[pos-1]>-1) and (current[pos-2]>-1): # if two cells to the left are cars
+            if (current[pos-1] > -1) and (current[pos-2] > -1): # if two cells to the left are cars
                 cells_in_clusters[t] += 1
                 cluster_state = True
-            if (current[pos-1] == -1) and (current[pos-2]>-1) and cluster_state:
+            if (current[pos-1] == -1) and (current[pos-2] > -1) and cluster_state:
                 cells_in_clusters[t] += 1 # there's a delayed aspect in this way of counting, so we add an extra count
                 cluster_state = False
 
             # Update the number of clusters: if i'm not a car and i have 2 cars to my left: +1
             if (current[pos] == -1) and (current[pos-1] > -1) and (current[pos-2] > -1):
                 cluster_count[t] += 1
+
+        # Update flow count between neighboring cells (only cells 4 and 5)
+        for i in range(v_max):
+            if current[(4-i)] > i:
+                flow_single_cell += 1
 
         positions.append(current)
 
@@ -89,18 +76,22 @@ def Nagel_Schreckenberg(L, N, v_max, p, t_max, max_brake=1, max_acceleration = 1
         total_velocity += one_time_total_velocity
 
     # Average the total velocity over the number of timesteps
-    average_velocity = total_velocity/t_max 
+    average_velocity = total_velocity/t_max
 
     return positions, cells_in_clusters, density, flow_single_cell, average_velocity, cluster_count
 
 
 
 def plot_simulation(simulation):
+    '''
+    Plots a grid of the velocities
+    '''
     import numpy as np
     import matplotlib.pyplot as plt
     timesteps, L = len(simulation), len(simulation[0])
     a = np.empty(shape=(timesteps, L), dtype=object)
 
+    # Make array of velocities and white spaces
     for i in range(L):
         for j in range(timesteps):
             a[j, i] = str(int(simulation[j][i])) if simulation[j][i] > -1 else ''
@@ -125,7 +116,7 @@ def plot_simulation(simulation):
     
 # Calculate the average flow over the whole timespan for a specific density
 def calculate_time_averaged_flow(flow_counts, t_max):
-    total_flow = sum(flow_counts)  # Sum the entire array
-    time_averaged_flow = total_flow / t_max  # Calculate the average
+    total_flow = sum(flow_counts)
+    time_averaged_flow = total_flow / t_max
     return time_averaged_flow
 
