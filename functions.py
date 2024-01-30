@@ -237,11 +237,23 @@ def calculate_time_averaged_flow(flow_counts, t_max):
 
 
 
-# Two lanes function (only a start)
+# Two lanes function
 
 def Two_Lane_CA(L, N, v_max, p, t_max, switch_trigger, min_front_gap, min_back_gap, max_brake=1, max_acceleration = 1):
+    """ Here I count average velocity using the previous saved velocities, but over a long time it shouldn't make much difference
+    should maybe try to coordinate the one lane and two lane so they count the same way
+    """
+    
     import random
     import numpy as np
+
+    # Analysis counts
+    cells_in_clusters = np.zeros(t_max)
+    cluster_count = np.zeros(t_max)
+    average_velocity = 0
+    total_velocity = 0
+
+
 
     # Initializing the first two rows (left and right lane). Cars are denoted with 0 and no car with -1.
     left_lane = N*[0] + (L-N)*[-1]
@@ -257,7 +269,13 @@ def Two_Lane_CA(L, N, v_max, p, t_max, switch_trigger, min_front_gap, min_back_g
     for t in range(t_max):
         previous_left_road, current_left_road = left_lane[-1], L * [-1]
         previous_right_road, current_right_road = right_lane[-1], L * [-1]
-    
+
+        # For each timestep reset the velocity count to zero
+        one_time_total_velocity = 0
+        # Set this boolean to false for counting cells in clusters later
+        left_cluster_state = False 
+        right_cluster_state = False 
+
         # Go through all the cells in the two rows
         for pos in range(L):
 
@@ -268,6 +286,8 @@ def Two_Lane_CA(L, N, v_max, p, t_max, switch_trigger, min_front_gap, min_back_g
                 other_lane_front_distance = 0
 
                 vi = previous_left_road[pos] # Store the velocity of the car in the previous timestep 
+                one_time_total_velocity += vi # Add this velocity to get the average velocity
+                
                 while previous_left_road[(pos + d) % L] < 0: # Check how many spaces ahead are free
                     d += 1 
                 while previous_right_road[(pos + other_lane_front_distance)%L]<0:
@@ -285,14 +305,25 @@ def Two_Lane_CA(L, N, v_max, p, t_max, switch_trigger, min_front_gap, min_back_g
                     else:
                         v = vtemp
                     current_left_road[(pos+v)%L] = v # Updates the cars position
-            
-            # Check the RIGHT lane
 
+            # Count the number of cells in a cluster in the left lane
+            if (current_left_road[pos-1] > -1) and (current_left_road[pos-2] > -1): # if two cells to the left are cars
+                cells_in_clusters[t] += 1
+                left_cluster_state = True
+            if (current_left_road[pos-1] == -1) and (current_left_road[pos-2] > -1) and left_cluster_state:
+                cells_in_clusters[t] += 1 # there's a delayed aspect in this way of counting, so we add an extra count
+                left_cluster_state = False
+            
+
+
+            # Check the RIGHT lane
+            
             if previous_right_road[pos] > -1: # Check if there is a car in this cell
                 d = 1              # Set the distance to the car ahead as 1 for now
                 other_lane_front_distance = 0
 
                 vi = previous_right_road[pos] # Store the velocity of the car in the previous timestep 
+                one_time_total_velocity += vi # Add this velocity to get the average velocity
                 while previous_right_road[(pos + d) % L] < 0: # Check how many spaces ahead are free
                     d += 1 
                 while previous_left_road[(pos + other_lane_front_distance)%L]<0:
@@ -310,11 +341,28 @@ def Two_Lane_CA(L, N, v_max, p, t_max, switch_trigger, min_front_gap, min_back_g
                     else:
                         v = vtemp
                     current_right_road[(pos+v)%L] = v # Updates the cars position
+            
+            # Count the number of cells in a cluster in the right lane (but add to the same count as the left one)
+            if (current_right_road[pos-1] > -1) and (current_right_road[pos-2] > -1): # if two cells to the left are cars
+                cells_in_clusters[t] += 1
+                right_cluster_state = True
+            if (current_left_road[pos-1] == -1) and (current_left_road[pos-2] > -1) and right_cluster_state:
+                cells_in_clusters[t] += 1 # there's a delayed aspect in this way of counting, so we add an extra count
+                right_cluster_state = False
 
         left_lane.append(current_left_road)
         right_lane.append(current_right_road)
 
-    return left_lane, right_lane
+        # Get the average velocity for this time step and add it to the total velocity
+        one_time_total_velocity = one_time_total_velocity/N 
+        total_velocity += one_time_total_velocity
+
+    # Average the total velocity over the number of timesteps
+    average_velocity = total_velocity/t_max
+
+    return left_lane, right_lane, average_velocity, cells_in_clusters
+
+
 
 
 
@@ -328,37 +376,53 @@ def plot_simulation(simulation_left, simulation_right):
     timesteps_left, L_left = len(simulation_left), len(simulation_left[0])
     timesteps_right, L_right = len(simulation_right), len(simulation_right[0])
     
-    fig, (ax_left, ax_right) = plt.subplots(1, 2, figsize=(12, 6))  # Create subplots for left and right lanes
+    fig, (ax_left, ax_right) = plt.subplots(1, 2, figsize=(12, 6.5))  # Create subplots for left and right lanes
+
 
     # Plot the LEFT lane
 
     # a_left holds the data for the left lane
-    a_left = np.empty(shape=(timesteps_left, L_left), dtype=object)
+    a_left = np.empty(shape=(timesteps_left + 1, L_left + 1), dtype=object)
     for i in range(L_left): # Go through the length of the road
         for j in range(timesteps_left): # Go through the time steps
-            # Set the value of this cell of this cell if it has a car
+            # Set the value of this cell if it has a car
             a_left[j, i] = str(int(simulation_left[j][i])) if simulation_left[j][i] > -1 else ''
-    
-    ax_left.set_xticks(np.arange(L_left))
-    ax_left.set_yticks(np.arange(timesteps_left))
-    ax_left.invert_yaxis()
-    for i in range(timesteps_left):
-        for j in range(L_left):
-            text = ax_left.text(j, i, a_left[i, j], ha="center", va="center")
+    # Create the grid and assign the car values
+    for i in range(timesteps_left + 1):
+        for j in range(L_left + 1):
+            text = ax_left.text(j + 0.5, i + 0.5, a_left[i, j], ha="center", va="center", fontsize=7)
 
-    # Plot the RIGHT lane in the same way
+
+    # Plot the RIGHT lane
             
-    a_right = np.empty(shape=(timesteps_right, L_right), dtype=object)
+    a_right = np.empty(shape=(timesteps_right+ 1, L_right+ 1), dtype=object)
+
     for i in range(L_right):
         for j in range(timesteps_right):
             a_right[j, i] = str(int(simulation_right[j][i])) if simulation_right[j][i] > -1 else ''
+    for i in range(timesteps_right + 1):
+        for j in range(L_right + 1):
+            text = ax_right.text(j + 0.5, i + 0.5, a_right[i, j], ha="center", va="center", fontsize=7)
+
+
+    # Set the grid and make time go down instead of up    
+    ax_left.set_xticks(np.arange(L_left + 1))
+    ax_left.set_yticks(np.arange(timesteps_left+1))
+    ax_left.invert_yaxis()
     
-    ax_right.set_xticks(np.arange(L_right))
-    ax_right.set_yticks(np.arange(timesteps_right))
+    ax_right.set_xticks(np.arange(L_right + 1))
+    ax_right.set_yticks(np.arange(timesteps_right+1))
     ax_right.invert_yaxis()
-    for i in range(timesteps_right):
-        for j in range(L_right):
-            text = ax_right.text(j, i, a_right[i, j], ha="center", va="center")
+
+    # Adjust the size of the timestep numbers on the y-axis
+    ax_left.tick_params(axis='y', labelsize=7)
+    
+
+    # Remove the cell numbers on the x-axes and remove the timestep numbers on the right plot 
+    ax_left.set_xticklabels([])
+    ax_right.set_xticklabels([])
+    ax_right.set_yticklabels([])
+
 
     # Apply grids and labels to both subplots
     ax_left.grid(color='black', linestyle='-', linewidth=0.5, alpha=0.5)
@@ -366,11 +430,13 @@ def plot_simulation(simulation_left, simulation_right):
 
     ax_left.set_xlabel('Left lane cells')
     ax_left.set_ylabel('Time steps')
-
     ax_right.set_xlabel('Right lane cells')
-    ax_right.set_ylabel('Time steps')
+    
     plt.suptitle('Two lanes simulation')
     plt.show()
+
+
+    
 
 
     
