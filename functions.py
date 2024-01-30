@@ -1,6 +1,11 @@
 def Nagel_Schreckenberg(L, N, v_max, p, t_max, max_brake = 1, max_acceleration = 1, seed = 2024):
     """
     asdfhjdsf
+    
+    The function outputs: 
+        cells_in_clusters returns a list of the number of cells in a cluster at each timestep
+        cluster_count returns a list of the number of clusters at each timestep
+        average_velocity returns a single value for the average velocity over all time
     """
     import random
     import numpy as np
@@ -79,6 +84,8 @@ def Nagel_Schreckenberg(L, N, v_max, p, t_max, max_brake = 1, max_acceleration =
     average_velocity = total_velocity/t_max
 
     return positions, cells_in_clusters, density, flow_single_cell, average_velocity, cluster_count
+
+
 
 
 
