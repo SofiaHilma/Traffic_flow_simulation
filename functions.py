@@ -1,89 +1,89 @@
-def Nagel_Schreckenberg(L, N, v_max, p, t_max, max_brake = 1, max_acceleration = 1, seed = 2024):
-    """
-    asdfhjdsf
+# def Nagel_Schreckenberg(L, N, v_max, p, t_max, max_brake = 1, max_acceleration = 1, seed = 2024):
+#     """
+#     asdfhjdsf
     
-    The function outputs: 
-        cells_in_clusters returns a list of the number of cells in a cluster at each timestep
-        cluster_count returns a list of the number of clusters at each timestep
-        average_velocity returns a single value for the average velocity over all time
-    """
-    import random
-    import numpy as np
+#     The function outputs: 
+#         cells_in_clusters returns a list of the number of cells in a cluster at each timestep
+#         cluster_count returns a list of the number of clusters at each timestep
+#         average_velocity returns a single value for the average velocity over all time
+#     """
+#     import random
+#     import numpy as np
 
-    random.seed(seed)
+#     random.seed(seed)
 
-    # Initialises the first row. Cars are denoted with 0 and empty spaces with -1.
-    initial = N*[0] + (L-N)*[-1]
-    random.shuffle(initial)
-    positions = [initial]
+#     # Initialises the first row. Cars are denoted with 0 and empty spaces with -1.
+#     initial = N*[0] + (L-N)*[-1]
+#     random.shuffle(initial)
+#     positions = [initial]
     
-    # Lists for cluster size and amount
-    cells_in_clusters = np.zeros(t_max)
-    cluster_count = np.zeros(t_max)
+#     # Lists for cluster size and amount
+#     cells_in_clusters = np.zeros(t_max)
+#     cluster_count = np.zeros(t_max)
 
-    # Variables for velocity statistics
-    average_velocity = 0
-    total_velocity = 0
+#     # Variables for velocity statistics
+#     average_velocity = 0
+#     total_velocity = 0
 
-    # Variables for measuring flow through cell 4
-    flow_single_cell = 0
-    density = 0
+#     # Variables for measuring flow through cell 4
+#     flow_single_cell = 0
+#     density = 0
 
-    # For each timestep we update the car positions and values
-    for t in range(t_max):
-        previous, current = positions[-1], L * [-1]
+#     # For each timestep we update the car positions and values
+#     for t in range(t_max):
+#         previous, current = positions[-1], L * [-1]
         
-        # Determine if there is a car in this cell
-        if previous[4] > -1:
-            density += 1
+#         # Determine if there is a car in this cell
+#         if previous[4] > -1:
+#             density += 1
 
-        # For each timestep reset the velocity count to zero
-        one_time_total_velocity = 0
-        cluster_state = False # Set this to false for counting cells in clusters later
+#         # For each timestep reset the velocity count to zero
+#         one_time_total_velocity = 0
+#         cluster_state = False # Set this to false for counting cells in clusters later
 
-        for pos in range(L):
-            if previous[pos] > -1: # Check if there is a car in this cell
-                distance_ahead = 1
-                v_prev = previous[pos]
-                while previous[(pos + distance_ahead) % L] < 0: # Check how many spaces ahead are free
-                    distance_ahead += 1 
-                v_temp = min(v_prev + random.randint(1, max_acceleration), distance_ahead - 1, v_max) # Accelerating
-                if random.uniform(0,1) < p: # Random braking
-                    v = max(v_temp-random.randint(1, max_brake), 0)
-                else:
-                    v = v_temp
-                current[(pos+v)%L] = v # Updates the cars position
+#         for pos in range(L):
+#             if previous[pos] > -1: # Check if there is a car in this cell
+#                 distance_ahead = 1
+#                 v_prev = previous[pos]
+#                 while previous[(pos + distance_ahead) % L] < 0: # Check how many spaces ahead are free
+#                     distance_ahead += 1 
+#                 v_temp = min(v_prev + random.randint(1, max_acceleration), distance_ahead - 1, v_max) # Accelerating
+#                 if random.uniform(0,1) < p: # Random braking
+#                     v = max(v_temp-random.randint(1, max_brake), 0)
+#                 else:
+#                     v = v_temp
+#                 current[(pos+v)%L] = v # Updates the cars position
                 
-                # Update the car velocity count
-                one_time_total_velocity += v
+#                 # Update the car velocity count
+#                 one_time_total_velocity += v
 
-            # Count the number of cells in a cluster
-            if (current[pos-1] > -1) and (current[pos-2] > -1): # if two cells to the left are cars
-                cells_in_clusters[t] += 1
-                cluster_state = True
-            if (current[pos-1] == -1) and (current[pos-2] > -1) and cluster_state:
-                cells_in_clusters[t] += 1 # there's a delayed aspect in this way of counting, so we add an extra count
-                cluster_state = False
+#             # Count the number of cells in a cluster
+#             if (current[pos-1] > -1) and (current[pos-2] > -1): # if two cells to the left are cars
+#                 cells_in_clusters[t] += 1
+#                 cluster_state = True
+#             if (current[pos-1] == -1) and (current[pos-2] > -1) and cluster_state:
+#                 cells_in_clusters[t] += 1 # there's a delayed aspect in this way of counting, so we add an extra count
+#                 cluster_state = False
 
-            # Update the number of clusters: if i'm not a car and i have 2 cars to my left: +1
-            if (current[pos] == -1) and (current[pos-1] > -1) and (current[pos-2] > -1):
-                cluster_count[t] += 1
+#             # Update the number of clusters: if i'm not a car and i have 2 cars to my left: +1
+#             if (current[pos] == -1) and (current[pos-1] > -1) and (current[pos-2] > -1):
+#                 cluster_count[t] += 1
 
-        # Update flow count between neighboring cells (only cells 4 and 5)
-        for i in range(v_max):
-            if current[(4-i)] > i:
-                flow_single_cell += 1
+#         # Update flow count between neighboring cells (only cells 4 and 5)
+#         for i in range(v_max):
+#             if current[(4-i)] > i:
+#                 flow_single_cell += 1
 
-        positions.append(current)
+#         positions.append(current)
 
-        # Get the average velocity for this time step and add it to the total velocity
-        one_time_total_velocity = one_time_total_velocity/N 
-        total_velocity += one_time_total_velocity
+#         # Get the average velocity for this time step and add it to the total velocity
+#         one_time_total_velocity = one_time_total_velocity/N 
+#         total_velocity += one_time_total_velocity
 
-    # Average the total velocity over the number of timesteps
-    average_velocity = total_velocity/t_max
+#     # Average the total velocity over the number of timesteps
+#     average_velocity = total_velocity/t_max
 
-    return positions, cells_in_clusters, density, flow_single_cell, average_velocity, cluster_count
+#     return positions, cells_in_clusters, density, flow_single_cell, average_velocity, cluster_count
 
 
 
@@ -92,108 +92,108 @@ def Nagel_Schreckenberg(L, N, v_max, p, t_max, max_brake = 1, max_acceleration =
 import random
 import numpy as np
 
-# class Nagel_Schreckenberg():
-#     """
-#     The function outputs: 
+class Nagel_Schreckenberg():
+    """
+    The function outputs: 
 
-#     """
-#     def __init__(self, L, N, v_max, p, t_max, max_brake = 1, max_acceleration = 1, seed = 2024):
+    """
+    def __init__(self, L, N, v_max, p, t_max, max_brake = 1, max_acceleration = 1, seed = 2024):
         
-#         self.L = L
-#         #Allows for density in percentages as well as calculated from absolute values
-#         if N < 1:
-#             self.N = int(N * L)
-#         else:
-#             self.N = N
-#         self.v_max = v_max
-#         self.p = p
-#         self.t_max = t_max
-#         self.max_brake = max_brake
-#         self.max_acceleration = max_acceleration
-#         self.seed = seed
-#         self.positions = []
+        self.L = L
+        #Allows for density in percentages as well as calculated from absolute values
+        if N < 1:
+            self.N = int(N * L)
+        else:
+            self.N = N
+        self.v_max = v_max
+        self.p = p
+        self.t_max = t_max
+        self.max_brake = max_brake
+        self.max_acceleration = max_acceleration
+        self.seed = seed
+        self.positions = []
 
 
-#     def run_model(self):
-#         random.seed(self.seed)
+    def run_model(self):
+        random.seed(self.seed)
 
-#         # Initialises the first row. Cars are denoted with 0 and empty spaces with -1.
-#         initial = self.N*[0] + (self.L-self.N)*[-1]
-#         random.shuffle(initial)
-#         positions = [initial]
+        # Initialises the first row. Cars are denoted with 0 and empty spaces with -1.
+        initial = self.N*[0] + (self.L-self.N)*[-1]
+        random.shuffle(initial)
+        positions = [initial]
 
-#         # For each timestep we update the car positions and values
-#         for t in range(self.t_max):
-#             previous, current = positions[-1], self.L * [-1]
+        # For each timestep we update the car positions and values
+        for t in range(self.t_max):
+            previous, current = positions[-1], self.L * [-1]
 
-#             for pos in range(self.L):
-#                 if previous[pos] > -1: # Check if there is a car in this cell
-#                     distance_ahead = 1
-#                     v_prev = previous[pos]
-#                     while previous[(pos + distance_ahead) % self.L] < 0: # Check how many spaces ahead are free
-#                         distance_ahead += 1 
-#                     v_temp = min(v_prev + random.randint(1, self.max_acceleration), distance_ahead - 1, self.v_max) # Accelerating
-#                     if random.uniform(0,1) < self.p: # Random braking
-#                         v = max(v_temp-random.randint(1, self.max_brake), 0)
-#                     else:
-#                         v = v_temp
-#                     current[(pos+v)%self.L] = v # Updates the cars position
+            for pos in range(self.L):
+                if previous[pos] > -1: # Check if there is a car in this cell
+                    distance_ahead = 1
+                    v_prev = previous[pos]
+                    while previous[(pos + distance_ahead) % self.L] < 0: # Check how many spaces ahead are free
+                        distance_ahead += 1 
+                    v_temp = min(v_prev + random.randint(1, self.max_acceleration), distance_ahead - 1, self.v_max) # Accelerating
+                    if random.uniform(0,1) < self.p: # Random braking
+                        v = max(v_temp-random.randint(1, self.max_brake), 0)
+                    else:
+                        v = v_temp
+                    current[(pos+v)%self.L] = v # Updates the cars position
                     
-#             positions.append(current)
+            positions.append(current)
 
-#         self.positions = positions
+        self.positions = positions
         
-#         return positions
+        return positions
     
 
-#     def flow(self):
-#         flow_single_cell = 0
-#         for t in range(self.t_max):
-#             for i in range(self.v_max):
-#                 if self.positions[t][4-i] > i:
-#                     flow_single_cell += 1
+    def flow(self):
+        flow_single_cell = 0
+        for t in range(self.t_max):
+            for i in range(self.v_max):
+                if self.positions[t][4-i] > i:
+                    flow_single_cell += 1
                     
-#         return flow_single_cell
+        return flow_single_cell
 
 
-#     def average_velocity(self):
-#         velocities_sum = 0
-#         for t in range(self.t_max):
-#             for i in range(self.L):
-#                 if self.positions[t][i] > -1:
-#                     velocities_sum += self.positions[t][i]
+    def average_velocity(self):
+        velocities_sum = 0
+        for t in range(self.t_max):
+            for i in range(self.L):
+                if self.positions[t][i] > -1:
+                    velocities_sum += self.positions[t][i]
 
-#         return velocities_sum/(self.N * self.t_max)
+        return velocities_sum/(self.N * self.t_max)
     
 
-#     def clusters(self):
-#         cells_in_clusters = np.zeros(self.t_max)
-#         cluster_count = np.zeros(self.t_max)
-#         for t in range(self.t_max):
-#             cluster_exists = False
-#             for i in range(self.L):
-#                 # Count the number of cells in a cluster
-#                 if (self.positions[t][i-1] > -1) and (self.positions[t][i-2] > -1): # if two cells to the left are cars
-#                     cells_in_clusters[t] += 1
-#                     cluster_exists = True
-#                 if (self.positions[t][i-1] == -1) and (self.positions[t][i-2] > -1) and cluster_exists:
-#                     cells_in_clusters[t] += 1 # there's a delayed aspect in this way of counting, so we add an extra count
-#                     cluster_exists = False
+    def clusters(self):
+        cells_in_clusters = np.zeros(self.t_max)
+        cluster_count = np.zeros(self.t_max)
+        for t in range(self.t_max):
+            cluster_exists = False
+            for i in range(self.L):
+                # Count the number of cells in a cluster
+                if (self.positions[t][i-1] > -1) and (self.positions[t][i-2] > -1): # if two cells to the left are cars
+                    cells_in_clusters[t] += 1
+                    cluster_exists = True
+                if (self.positions[t][i-1] == -1) and (self.positions[t][i-2] > -1) and cluster_exists:
+                    cells_in_clusters[t] += 1 # there's a delayed aspect in this way of counting, so we add an extra count
+                    cluster_exists = False
 
-#                 # Update the number of clusters: if i'm not a car and i have 2 cars to my left: +1
-#                 if (self.positions[t][i] == -1) and (self.positions[t][i-1] > -1) and (self.positions[t][i-2] > -1):
-#                     cluster_count[t] += 1
+                # Update the number of clusters: if i'm not a car and i have 2 cars to my left: +1
+                if (self.positions[t][i] == -1) and (self.positions[t][i-1] > -1) and (self.positions[t][i-2] > -1):
+                    cluster_count[t] += 1
 
-#         return cells_in_clusters, cluster_count
+        return cells_in_clusters, cluster_count
 
 
-#     def density(self):
-#         density = 0
-#         for t in range(self.t_max):
-#             # Determine if there is a car in this cell
-#             if self.positions[t][4] > -1:
-#                 density += 1
-#         return density
+    def density(self):
+        density = 0
+        for t in range(self.t_max):
+            # Determine if there is a car in this cell
+            if self.positions[t][4] > -1:
+                density += 1
+        return density
 
 
 def plot_simulation(simulation):
