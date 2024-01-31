@@ -57,7 +57,7 @@ class Nagel_Schreckenberg():
 
     def flow(self):
         flow_single_cell = 0
-        for t in range(self.t_max):
+        for t in range(1, self.t_max+1):
             for i in range(self.v_max):
                 if self.positions[t][4-i] > i:
                     flow_single_cell += 1
@@ -92,6 +92,9 @@ class Nagel_Schreckenberg():
                 # Update the number of clusters: if i'm not a car and i have 2 cars to my left: +1
                 if (self.positions[t][i] == -1) and (self.positions[t][i-1] > -1) and (self.positions[t][i-2] > -1):
                     cluster_count[t] += 1
+
+            if cells_in_clusters[t] == self.L:
+                cluster_count[t] = 1
 
         return cells_in_clusters, cluster_count
 
