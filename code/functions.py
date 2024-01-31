@@ -115,7 +115,7 @@ def plot_simulation1(simulation):
     import numpy as np
     import matplotlib.pyplot as plt
     timesteps, L = len(simulation), len(simulation[0])
-    a = np.empty(shape=(timesteps, L), dtype=object)
+    a = np.empty(shape=(timesteps+1, L+1), dtype=object)
 
     # Make array of velocities and white spaces
     for i in range(L):
@@ -123,21 +123,22 @@ def plot_simulation1(simulation):
             a[j, i] = str(int(simulation[j][i])) if simulation[j][i] > -1 else ''
 
     fig, ax = plt.subplots(figsize = (L/7.5, timesteps/7.5), dpi = 150)
-    ax.set_xticks(np.arange(L))
-    ax.set_yticks(np.arange(timesteps))
+    ax.set_xticks(np.arange(L+1))
+    ax.set_yticks(np.arange(timesteps+1))
     ax.set_xticklabels([])
     ax.set_yticklabels([])
     ax.invert_yaxis()
 
-    for i in range(timesteps):
-        for j in range(L):
-            text = ax.text(j, i, a[i, j], ha="center", va="center")
+    for i in range(timesteps+1):
+        for j in range(L+1):
+            text = ax.text(j + 0.5, i + 0.5, a[i, j], ha="center", va="center")
 
     plt.xlabel('Position')
     plt.ylabel('<-- Time')
     # plt.title('Traffic Simulation')
     plt.grid(color='black', linestyle='-', linewidth=0.5, alpha=0.5)
     plt.show()
+
 
 
 # Two lanes function
