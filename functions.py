@@ -119,7 +119,7 @@ def plot_simulation1(simulation):
         for j in range(timesteps):
             a[j, i] = str(int(simulation[j][i])) if simulation[j][i] > -1 else ''
 
-    fig, ax = plt.subplots(figsize = (L/7.5, timesteps/7.5))
+    fig, ax = plt.subplots(figsize = (L/7.5, timesteps/7.5), dpi = 150)
     ax.set_xticks(np.arange(L))
     ax.set_yticks(np.arange(timesteps))
     ax.set_xticklabels([])
@@ -131,8 +131,8 @@ def plot_simulation1(simulation):
             text = ax.text(j, i, a[i, j], ha="center", va="center")
 
     plt.xlabel('Position')
-    plt.ylabel('Time Step')
-    plt.title('Traffic Simulation')
+    plt.ylabel('<-- Time')
+    # plt.title('Traffic Simulation')
     plt.grid(color='black', linestyle='-', linewidth=0.5, alpha=0.5)
     plt.show()
 
