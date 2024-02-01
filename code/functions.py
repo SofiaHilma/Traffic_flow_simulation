@@ -324,6 +324,7 @@ def plot_simulation(simulation_left, simulation_right):
 
     # Remove the cell numbers on the x-axes and remove the timestep numbers on the right plot 
     ax_left.set_xticklabels([])
+    ax_left.set_yticklabels([])
     ax_right.set_xticklabels([])
     ax_right.set_yticklabels([])
 
