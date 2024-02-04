@@ -1,11 +1,11 @@
 # Simulating traffic flow using the Nagel-Schreckenberg model
 
-Brief description of the project: In this project we want to study traffic flow and how congestion emerges. For this, we use the Nagel Schreckenberg cellular automota model to observe the effect of different parameters such car density, max velocity and driver behaviour. In particular, we wish to study the occurence of phase transitions when varying the values of these parameters.
+Brief description of the project: In this project we want to study traffic flow and how congestion emerges. For this, we use the Nagel Schreckenberg cellular automata model to observe the effect of different parameters such as car density, max velocity and driver behaviour. In particular, we wish to study the occurence of phase transitions when varying the values of these parameters.
 
 
 ## Background and motivation
 
-With cars being by far the most used form of transport worldwide, it is crucial to understand the dynamics of road traffic systems and how congestion emerges in these systems. Despite traffic being dependent on many individually complex drivers, the fundamental dynamics of a road as a system can be actually be modelled using basic methods such as cellular automata. Among such CA, the simplest non-deterministic model of single-lane traffic is the Nagel-Schreckenberg model. Using this model, this project aims to conduct analysis on the emergent behaviour of traffic jams with respect to particular parameters to better understand the important factors of such a traffic system.
+With cars being by far the most used form of transport worldwide, it is crucial to understand the dynamics of road traffic systems and how congestion emerges in these systems. Despite traffic being dependent on many individually complex drivers, the fundamental dynamics of a road as a system can be modelled using basic methods such as cellular automata. Among such CA, the simplest non-deterministic model of single-lane traffic is the Nagel-Schreckenberg model. Using this model, this project aims to conduct analysis on the emergent behaviour of traffic jams with respect to particular parameters to better understand the important factors of such a traffic system.
 
 
 ## Research question
