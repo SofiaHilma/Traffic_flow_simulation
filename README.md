@@ -24,7 +24,7 @@ We hypothesize that there exists a critical density threshold below which traffi
 
 
 ## Installation
-To install the necessary packages, run the command/
+To install the necessary packages, run the command\
 `pip install -r requirements.txt`
 
 
