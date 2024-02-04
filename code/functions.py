@@ -3,11 +3,17 @@ import numpy as np
 
 class Nagel_Schreckenberg():
     """
-    The function outputs: 
-
+    Creates a Nagel-Schreckenberg model simulation
+    - .run_model to run for the given number of timesteps
+    - .flow returns total flow per Nagel and Schreckenberg (1992) over all timesteps
+    - .average_velocity returns average velocity over all timesteps
+    -.clusters returns a 2-item list containing total number of cells in clusters and number of clusters per timestep
+    -.density returns density per Nagel and Schreckenberg (1992) over all timesteps
     """
     def __init__(self, L, N, v_max, p, t_max, max_brake = 1, max_acceleration = 1, seed = 2024):
-        
+        """
+        Constructs all the necessary attributes for the model object
+        """
         self.L = L
         #Allows for density in percentages as well as calculated from absolute values
         if N < 1:
@@ -24,6 +30,9 @@ class Nagel_Schreckenberg():
 
 
     def run_model(self):
+        """
+        Runs the model for given parameters
+        """
         random.seed(self.seed)
 
         # Initialises the first row. Cars are denoted with 0 and empty spaces with -1.
@@ -56,6 +65,9 @@ class Nagel_Schreckenberg():
     
 
     def flow(self):
+        """
+        Returns total flow per Nagel and Schreckenberg (1992) over all timesteps
+        """
         flow_single_cell = 0
         for t in range(1, self.t_max+1):
             for i in range(self.v_max):
@@ -66,6 +78,9 @@ class Nagel_Schreckenberg():
 
 
     def average_velocity(self):
+        """
+        Returns average velocity over all timesteps
+        """
         velocities_sum = 0
         for t in range(self.t_max):
             for i in range(self.L):
@@ -76,6 +91,9 @@ class Nagel_Schreckenberg():
     
 
     def clusters(self):
+        """
+        Returns a 2-item list containing total number of cells in clusters and number of clusters per timestep
+        """
         cells_in_clusters = np.zeros(self.t_max)
         cluster_count = np.zeros(self.t_max)
         for t in range(self.t_max):
@@ -100,6 +118,9 @@ class Nagel_Schreckenberg():
 
 
     def density(self):
+        """
+        Returns density per Nagel and Schreckenberg (1992) over all timesteps
+        """
         density = 0
         for t in range(self.t_max):
             # Determine if there is a car in this cell
@@ -109,9 +130,9 @@ class Nagel_Schreckenberg():
 
 
 def plot_simulation1(simulation):
-    '''
+    """
     Plots a grid of the car velocities
-    '''
+    """
     import numpy as np
     import matplotlib.pyplot as plt
     timesteps, L = len(simulation), len(simulation[0])
@@ -144,8 +165,12 @@ def plot_simulation1(simulation):
 # Two lanes function
 
 def Two_Lane_CA(L, N, v_max, p, t_max, switch_trigger, min_front_gap, min_back_gap, max_brake=1, max_acceleration = 1):
-    """ Here I count average velocity using the previous saved velocities, but over a long time it shouldn't make much difference
-    should maybe try to coordinate the one lane and two lane so they count the same way
+    """
+    Creates a 2-lane Nagel-Schreckenberg model simulation. Returns
+    - positions per timestep in left lane
+    - positions per timestep in right lane
+    - average velocity
+    - number of cells in clusters per timestep
     """
     
     import random
@@ -273,6 +298,9 @@ def Two_Lane_CA(L, N, v_max, p, t_max, switch_trigger, min_front_gap, min_back_g
 # Plotting the two lanes
 
 def plot_simulation(simulation_left, simulation_right):
+    '''
+    Plots velocity grid for 2-lane Nagel-Schreckenberg model
+    '''
     import numpy as np
     import matplotlib.pyplot as plt
 

@@ -1,29 +1,35 @@
-# Traffic flow simulation
+# Simulating traffic flow using the Nagel-Schreckenberg model
 
-Brief description of the project: In this project we want to study traffic flow and how congestion emerges. We use the Nagel Schreckenberg model to study phase transitions and potentially the intelligent driver model to study more realistic details of traffic flow.
+Brief description of the project: In this project we want to study traffic flow and how congestion emerges. For this, we use the Nagel Schreckenberg cellular automota model to observe the effect of different parameters such car density, max velocity and driver behaviour. In particular, we wish to study the occurence of phase transitions when varying the values of these parameters.
 
-Installation Instructions ?
 
-Acknowledgement of third-party libraries, tools, or resources that your project relies on ?
+## Background and motivation
 
-# Some research questions we could flesh out the project with:
+With cars being by far the most used form of transport worldwide, it is crucial to understand the dynamics of road traffic systems and how congestion emerges in these systems. Despite traffic being dependent on many individually complex drivers, the fundamental dynamics of a road as a system can be actually be modelled using basic methods such as cellular automata. Among such CA, the simplest non-deterministic model of single-lane traffic is the Nagel-Schreckenberg model. Using this model, this project aims to conduct analysis on the emergent behaviour of traffic jams with respect to particular parameters to better understand the important factors of such a traffic system.
 
-Phase Transitions in Traffic Flow: How does the Nagel-Schreckenberg model exhibit phase transitions between different traffic flow regimes (e.g., free flow, synchronized flow, congested flow), and what are the critical parameters governing these transitions?
 
-Self-Organizing Criticality in Traffic Dynamics: Can the Nagel-Schreckenberg model exhibit self-organizing criticality, where traffic dynamics naturally evolve to a state where small perturbations propagate across the system, leading to avalanches of congestion or flow interruptions?
+## Research question
 
-Power Law Behavior in Traffic Congestion: Investigating whether the distribution of traffic congestion events in the Nagel-Schreckenberg model follows a power law distribution, and if so, what underlying mechanisms drive this behavior and how it relates to self-organizing criticality.
+How does varying different parameter values affect the Nagel-Schreckenberg model?
 
-Impact of Network Topology on Phase Transitions: How does the topology of the road network influence the occurrence and characteristics of phase transitions in traffic flow dynamics simulated by the Nagel-Schreckenberg model?
+### Sub research questions
 
-Criticality and Resilience: Examining how self-organizing criticality in the Nagel-Schreckenberg model affects the resilience of traffic networks to perturbations, and identifying strategies to enhance system robustness in the face of critical events.
+Under which initial condition of density do we see congestion emerge?
+Under which initial conditions of car speed do we see congestion emerge?
+How does erratic driving behaviour, i.e. sharp braking and accelerating, affect the system?
 
-Dynamic Phase Transitions: Exploring how phase transitions in the Nagel-Schreckenberg model evolve dynamically in response to changing environmental conditions, traffic demand, or infrastructure modifications.
 
-Scaling Laws in Traffic Dynamics: Investigating whether scaling laws emerge in the Nagel-Schreckenberg model, where certain traffic flow properties (e.g., traffic density, flow rate) exhibit scale-invariant behavior across different spatial and temporal scales.
+## Hypotheses
+We hypothesize that there exists a critical density threshold below which traffic flows smoothly, but beyond which congestion rapidly ensues. Furthermore, we expect there to be similar critical values for other parameters of the model.
 
-Phase Transitions in Multi-Agent Systems: How do phase transitions manifest in multi-agent versions of the Nagel-Schreckenberg model, where individual vehicles adapt their behavior based on local interactions, and how does this influence overall traffic flow patterns?
 
-Robustness of Power Law Behavior: Assessing the robustness of power law behavior in the Nagel-Schreckenberg model under different model assumptions, parameterizations, and variations in network structure.
+## Installation
+To install the necessary packages, run the command
+`pip install -r requirements.txt`
 
-Phase Transitions and Control Strategies: Investigating how control strategies such as traffic signal timing, speed limits, or lane management influence the occurrence and characteristics of phase transitions in traffic flow dynamics simulated by the Nagel-Schreckenberg model.
+
+## References
+
+Nagel, Kai & Schreckenberg, Michael. (1992). A cellular automaton model for freeway traffic. Journal de Physique I. 2. 2221. 10.1051/jp1:1992277. 
+
+Rickert, Marcus, et al. "Two lane traffic simulations using cellular automata." Physica A: Statistical Mechanics and its Applications 231.4 (1996): 534-550.
