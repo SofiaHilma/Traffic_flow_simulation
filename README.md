@@ -14,9 +14,9 @@ How does varying different parameter values affect the Nagel-Schreckenberg model
 
 ### Sub research questions
 
-Under which initial condition of density do we see congestion emerge?
-Under which initial conditions of car speed do we see congestion emerge?
-How does erratic driving behaviour, i.e. sharp braking and accelerating, affect the system?
+- Under which initial condition of density do we see congestion emerge?
+- Under which initial conditions of car speed do we see congestion emerge?
+- How does erratic driving behaviour, i.e. sharp braking and accelerating, affect the system?
 
 
 ## Hypotheses
@@ -24,7 +24,7 @@ We hypothesize that there exists a critical density threshold below which traffi
 
 
 ## Installation
-To install the necessary packages, run the command
+To install the necessary packages, run the command/
 `pip install -r requirements.txt`
 
 
